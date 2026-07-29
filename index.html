@@ -788,6 +788,42 @@ header.top{background:rgba(7,9,13,.35);border-color:transparent}
 .form-pill .btn{white-space:nowrap}
 .form-pill input.err{border-color:var(--red);animation:shake .4s}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+/* поле-ловушка для ботов — не видно человеку */
+.hp{position:absolute!important;left:-9999px!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none}
+
+/* кнопка в состоянии отправки */
+.btn.loading{pointer-events:none;opacity:.75}
+.btn.loading::before{
+  content:'';width:16px;height:16px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.35);border-top-color:#fff;
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* экран «заявка отправлена» */
+.form-done{
+  max-width:640px;margin:0 auto;
+  background:linear-gradient(170deg, rgba(22,104,201,.20), rgba(10,14,22,.6));
+  border:1px solid rgba(27,118,224,.45);border-radius:var(--radius-lg);
+  padding:38px 34px 34px;
+  animation:doneIn .6s var(--ease-out);
+}
+@keyframes doneIn{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
+.done-mark{
+  width:64px;height:64px;border-radius:50%;margin:0 auto 20px;
+  background:rgba(74,222,128,.14);border:1px solid rgba(74,222,128,.5);
+  position:relative;
+}
+.done-mark::after{
+  content:'';position:absolute;left:22px;top:17px;
+  width:14px;height:26px;
+  border-right:3px solid #4ade80;border-bottom:3px solid #4ade80;
+  transform:rotate(42deg);
+}
+.form-done h3{font-size:26px;margin-bottom:12px}
+.form-done p{color:var(--muted);font-size:16px;margin-bottom:24px}
+.form-done .alt-contacts{margin-top:0}
+
 .hint{color:var(--dim);font-size:13px;margin-top:14px;transition:color var(--t-fast)}
 .hint.error{color:var(--red)}
 .hint.ok{color:#4ade80}
@@ -1649,13 +1685,15 @@ footer{
 <section class="contact" id="contact">
   <div class="wrap">
     <h2 class="split">Расскажите о задаче —<br>предложу решение и цену</h2>
-    <p class="lead reveal d1">Оставьте имя, номер и тип задачи, нажмите кнопку — откроется чат с уже готовым сообщением. Отвечаю в течение рабочего дня: разберём вашу нишу, покажу похожие проекты и назову точную стоимость.</p>
+    <p class="lead reveal d1">Оставьте имя, телефон, почту и тип задачи — заявка придёт мне сразу. Отвечаю в течение рабочего дня: разберём вашу нишу, покажу похожие проекты и назову точную стоимость. Ничего никому не пересылаю.</p>
 
     <form class="form-pill reveal d2" id="leadForm" novalidate>
       <select class="f-country" id="country" aria-label="Код страны"></select>
       <input class="f-name" id="name" type="text" placeholder="Ваше имя" autocomplete="name">
       <input class="f-phone" id="phone" type="tel" placeholder="700 123 45 67" autocomplete="tel" inputmode="numeric">
       <input class="f-email" id="email" type="email" placeholder="Ваш e-mail" autocomplete="email" inputmode="email">
+      <!-- ловушка для спам-ботов: человек это поле не видит -->
+      <input class="hp" type="text" id="company" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
       <select id="task" aria-label="Тип задачи">
         <option value="">Какая задача?</option>
         <option value="лендинг">Лендинг</option>
@@ -1666,9 +1704,19 @@ footer{
         <option value="фирменный стиль">Фирменный стиль</option>
         <option value="другую задачу">Другое</option>
       </select>
-      <button class="btn magnetic" type="submit">Написать в WhatsApp</button>
+      <button class="btn magnetic" type="submit" id="submitBtn">Отправить заявку</button>
     </form>
     <p class="hint" id="hint">Заполните имя, телефон и почту — на неё пришлю смету</p>
+
+    <div class="form-done" id="formDone" hidden>
+      <div class="done-mark" aria-hidden="true"></div>
+      <h3>Заявка отправлена</h3>
+      <p>Спасибо! Я уже получил вашу заявку и свяжусь в течение рабочего дня. Если вопрос срочный — напишите мне сразу в мессенджер.</p>
+      <div class="alt-contacts">
+        <a href="#" class="btn" id="doneWa" target="_blank" rel="noopener">Написать в WhatsApp</a>
+        <button type="button" class="btn btn-ghost" id="againBtn">Отправить ещё одну</button>
+      </div>
+    </div>
 
     <div class="alt-contacts reveal">
       <button type="button" class="btn btn-ghost" id="sendMail">Отправить заявку на почту</button>
@@ -1711,6 +1759,15 @@ footer{
 var WA_NUMBER   = '77000000000';
 var TG_USERNAME = 'your_username';
 var EMAIL       = 'adilbek.abdrassk@gmail.com';
+
+/* ============================================================
+   ПРИЁМ ЗАЯВОК: письмо на Gmail + строка в Google Таблице
+   Вставьте сюда адрес веб-приложения Apps Script — он выглядит так:
+   https://script.google.com/macros/s/AKfycb..../exec
+   Пошагово: файл НАСТРОЙКА-ФОРМЫ.md
+   Пока строка пустая — заявка уходит в WhatsApp, как раньше.
+   ============================================================ */
+var FORM_ENDPOINT = '';
 
 /* ============================================================
    ЯДРО: режимы устройства
@@ -2351,20 +2408,105 @@ phone.addEventListener('paste', function(e){
 nameField.addEventListener('input', resetHint);
 emailField.addEventListener('input', resetHint);
 
-/* отправка в WhatsApp — почта клиента идёт в тексте сообщения */
-document.getElementById('leadForm').addEventListener('submit', function(e){
+/* ---------- текст заявки для мессенджера ---------- */
+function leadToText(lead){
+  return 'Здравствуйте! Меня зовут ' + lead.name + '. ' + lead.what + '\n' +
+         'Телефон: ' + lead.phone + ' (' + lead.country + ')\n' +
+         'Почта: ' + lead.email;
+}
+
+/* ---------- экран «заявка отправлена» ---------- */
+var leadForm  = document.getElementById('leadForm');
+var submitBtn = document.getElementById('submitBtn');
+var formDone  = document.getElementById('formDone');
+
+function showDone(lead){
+  document.getElementById('doneWa').href =
+    'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(leadToText(lead));
+  leadForm.hidden = true;
+  hint.hidden = true;
+  formDone.hidden = false;
+  formDone.scrollIntoView({ block:'center', behavior: REDUCED ? 'auto' : 'smooth' });
+}
+
+document.getElementById('againBtn').addEventListener('click', function(){
+  leadForm.reset();
+  applyCountry();
+  leadForm.hidden = false;
+  hint.hidden = false;
+  formDone.hidden = true;
+  resetHint();
+  nameField.focus();
+});
+
+/* ---------- отправка заявки ---------- */
+leadForm.addEventListener('submit', function(e){
   e.preventDefault();
   var lead = collectLead();
   if(!lead) return;
 
-  var text = 'Здравствуйте! Меня зовут ' + lead.name + '. ' + lead.what + '\n' +
-             'Телефон: ' + lead.phone + ' (' + lead.country + ')\n' +
-             'Почта: ' + lead.email;
-  window.open('https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(text), '_blank', 'noopener');
+  /* эндпоинт не настроен — работаем по-старому, через WhatsApp */
+  if(!FORM_ENDPOINT){
+    window.open('https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(leadToText(lead)), '_blank', 'noopener');
+    hint.classList.remove('error');
+    hint.classList.add('ok');
+    hint.textContent = 'Открываю WhatsApp — сообщение уже готово, осталось нажать «отправить».';
+    return;
+  }
 
-  hint.classList.remove('error');
-  hint.classList.add('ok');
-  hint.textContent = 'Открываю WhatsApp — сообщение уже готово, осталось нажать «отправить».';
+  var payload = {
+    name:    lead.name,
+    phone:   lead.phone,
+    email:   lead.email,
+    task:    lead.task,
+    country: lead.country,
+    company: document.getElementById('company').value,   /* ловушка для ботов */
+    source:  document.referrer || 'прямой заход',
+    page:    location.href
+  };
+
+  var btnText = submitBtn.textContent;
+  submitBtn.classList.add('loading');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Отправляю…';
+  hint.classList.remove('error','ok');
+  hint.textContent = 'Отправляю заявку…';
+
+  function restore(){
+    submitBtn.classList.remove('loading');
+    submitBtn.disabled = false;
+    submitBtn.textContent = btnText;
+  }
+
+  fetch(FORM_ENDPOINT, {
+    method:'POST',
+    /* text/plain — чтобы браузер не слал preflight-запрос, который Apps Script не обрабатывает */
+    headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload),
+    redirect:'follow'
+  })
+  .then(function(res){ return res.json().catch(function(){ return { ok:true }; }); })
+  .then(function(data){
+    restore();
+    if(data && data.ok === false) throw new Error(data.error || 'Сервер вернул ошибку');
+    showDone(lead);
+  })
+  .catch(function(){
+    /* сеть или CORS подвели — повторяем «вслепую», чтобы заявка всё-таки дошла */
+    fetch(FORM_ENDPOINT, {
+      method:'POST',
+      mode:'no-cors',
+      headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    })
+    .then(function(){ restore(); showDone(lead); })
+    .catch(function(){
+      restore();
+      hint.classList.add('error');
+      hint.textContent = 'Не удалось отправить — напишите мне в WhatsApp, сообщение уже готово.';
+      window.open('https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(leadToText(lead)), '_blank', 'noopener');
+    });
+  });
 });
 
 /* отправка заявки на почту: письмо уходит на ваш адрес, обратный адрес — клиента */
