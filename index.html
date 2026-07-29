@@ -921,11 +921,23 @@ footer{
   .nav-links{display:none}
   .nav .btn{display:none}
   .burger{display:block}
-  .hero{padding-top:118px;min-height:auto}
-  .hero-grid{grid-template-columns:1fr;gap:0}
-  .hero-copy{padding-bottom:10px}
-  .hero-lead{font-size:17px;margin-bottom:20px}
-  .hero-photo{max-width:340px;margin:14px auto 0;justify-self:center}
+  /* на узких экранах: фото сверху по центру, под ним заголовок и кнопки */
+  .hero{padding-top:104px;min-height:auto}
+  .hero-grid{display:flex;flex-direction:column;align-items:center;gap:0}
+  .hero-photo{
+    order:-1;                       /* фото поднимается над текстом */
+    position:static;margin:0 auto;
+    width:100%;max-width:300px;opacity:1;
+  }
+  .hero-photo img{
+    border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+    mask-image:linear-gradient(180deg,#000 66%,transparent 100%);
+    -webkit-mask-image:linear-gradient(180deg,#000 66%,transparent 100%);
+  }
+  .hero-copy{padding-bottom:10px;text-align:center;width:100%}
+  .hero-lead{font-size:17px;margin:0 auto 20px}
+  .hero h1{margin-bottom:26px}
+  .hero-cta{justify-content:center}
   .hero-cta .btn{flex:1 1 100%}
   .marquee{margin-top:34px}
   .hero h1{font-size:clamp(40px,11vw,68px)}
@@ -954,7 +966,7 @@ footer{
 @media (max-width:720px){
   .wrap{padding:0 20px}
   .sec{padding:70px 0}
-  .hero-photo{max-width:290px}
+  .hero-photo{max-width:250px}
   .stat{padding:18px 20px}
   .stat b{font-size:28px}
   .works-grid{grid-template-columns:1fr}
@@ -2087,8 +2099,8 @@ if(!REDUCED){
   })();
 }
 
-/* ---------- параллакс фото ---------- */
-if(FANCY){
+/* ---------- параллакс фото (только на широких экранах) ---------- */
+if(FANCY && window.innerWidth > 900){
   (function(){
     var photo = document.getElementById('heroPhoto');
     var tx = 0, ty = 0, cx = 0, cy = 0;
