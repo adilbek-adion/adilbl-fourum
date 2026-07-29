@@ -159,24 +159,57 @@ section{position:relative}
    ============================================================ */
 #preloader{
   position:fixed;inset:0;z-index:200;
-  background:var(--bg-0);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
-  transition:opacity .7s ease, visibility .7s ease;
+  background:
+    radial-gradient(900px 600px at 50% 45%, rgba(22,104,201,.16), transparent 65%),
+    var(--bg-0);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;
+  transition:opacity 1.1s var(--ease-out), visibility 1.1s var(--ease-out);
 }
 #preloader.done{opacity:0;visibility:hidden}
+#preloader.done .pre-inner{transform:translateY(-16px) scale(1.06);opacity:0}
+.pre-inner{
+  display:flex;flex-direction:column;align-items:center;gap:22px;
+  transition:transform 1.1s var(--ease-out), opacity .8s ease;
+}
 .pre-logo{
-  font-family:'Oswald',sans-serif;font-size:clamp(28px,6vw,46px);
-  text-transform:uppercase;letter-spacing:.16em;
-  display:flex;gap:.06em;
+  font-family:'Oswald',sans-serif;font-size:clamp(30px,6.5vw,52px);
+  text-transform:uppercase;letter-spacing:.18em;
+  display:flex;gap:.04em;position:relative;
 }
 .pre-logo span{
-  display:inline-block;opacity:0;transform:translateY(18px);
-  animation:preIn .6s var(--ease-out) forwards;
+  display:inline-block;opacity:0;
+  transform:translateY(26px) rotateX(-60deg);
+  animation:preIn 1s var(--ease-out) forwards;
 }
 .pre-logo span.accent{color:var(--red)}
 @keyframes preIn{to{opacity:1;transform:none}}
-.pre-bar{width:180px;height:2px;background:rgba(255,255,255,.12);overflow:hidden;border-radius:2px}
-.pre-bar i{display:block;height:100%;width:0;background:var(--red);transition:width .3s linear}
+
+/* блик, медленно проходящий по логотипу */
+.pre-logo::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(100deg, transparent 38%, rgba(255,255,255,.55) 50%, transparent 62%);
+  background-size:250% 100%;background-position:150% 0;
+  mix-blend-mode:overlay;pointer-events:none;
+  animation:preShine 2.2s ease-in-out 1.5s forwards;
+}
+@keyframes preShine{to{background-position:-80% 0}}
+
+.pre-tag{
+  font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:var(--dim);
+  opacity:0;animation:preTag 1.2s var(--ease-out) 1.35s forwards;
+}
+@keyframes preTag{to{opacity:1}}
+
+.pre-bar{
+  width:200px;height:2px;background:rgba(255,255,255,.10);
+  overflow:hidden;border-radius:2px;
+  opacity:0;animation:preTag .8s ease .5s forwards;
+}
+.pre-bar i{
+  display:block;height:100%;width:0;
+  background:linear-gradient(90deg,var(--blue-bright),var(--red));
+  box-shadow:0 0 10px rgba(239,74,82,.6);
+}
 
 /* ============================================================
    4. КУРСОР
@@ -968,12 +1001,15 @@ footer{
 
 <!-- ================= ПРЕЛОАДЕР ================= -->
 <div id="preloader">
-  <div class="pre-logo" aria-hidden="true">
-    <span style="animation-delay:.00s">A</span><span style="animation-delay:.05s">D</span><span style="animation-delay:.10s">I</span><span style="animation-delay:.15s">O</span><span style="animation-delay:.20s">N</span>
-    <span style="width:.4em"></span>
-    <span class="accent" style="animation-delay:.30s">F</span><span class="accent" style="animation-delay:.35s">O</span><span class="accent" style="animation-delay:.40s">R</span><span class="accent" style="animation-delay:.45s">M</span>
+  <div class="pre-inner">
+    <div class="pre-logo" aria-hidden="true">
+      <span style="animation-delay:.10s">A</span><span style="animation-delay:.22s">D</span><span style="animation-delay:.34s">I</span><span style="animation-delay:.46s">O</span><span style="animation-delay:.58s">N</span>
+      <span style="width:.42em"></span>
+      <span class="accent" style="animation-delay:.76s">F</span><span class="accent" style="animation-delay:.88s">O</span><span class="accent" style="animation-delay:1.00s">R</span><span class="accent" style="animation-delay:1.12s">M</span>
+    </div>
+    <div class="pre-tag" aria-hidden="true">веб-дизайн · сайты · презентации</div>
+    <div class="pre-bar"><i id="preBar"></i></div>
   </div>
-  <div class="pre-bar"><i id="preBar"></i></div>
 </div>
 
 <!-- ================= КУРСОР ================= -->
@@ -1796,7 +1832,7 @@ function observeReveals(root){
     revealObserver.observe(el);
   });
 }
-observeReveals();
+/* наблюдение включается не сразу, а после ухода заставки — см. startSite() */
 
 /* ---------- разбивка заголовков на слова ---------- */
 document.querySelectorAll('.split').forEach(function(el){
@@ -1809,26 +1845,49 @@ document.querySelectorAll('.split').forEach(function(el){
   }).join('');
 });
 
-/* ---------- прелоадер ---------- */
+/* ---------- прелоадер ----------
+   Заставка держится не меньше SHOW_TIME, даже если страница
+   загрузилась мгновенно: логотип должны успеть прочитать.
+   Анимации самого сайта стартуют только после того, как занавес ушёл. */
 (function(){
   var pre = document.getElementById('preloader');
   var bar = document.getElementById('preBar');
-  var p = 0;
-  var tick = setInterval(function(){
-    p = Math.min(100, p + Math.random() * 18 + 6);
+  var SHOW_TIME = REDUCED ? 500 : 3400;   /* сколько висит заставка */
+  var started = Date.now();
+  var loaded = false, closed = false;
+
+  /* полоса заполняется ровно, в такт заставке */
+  (function grow(){
+    var p = Math.min(100, (Date.now() - started) / SHOW_TIME * 100);
     bar.style.width = p + '%';
-    if(p >= 100) clearInterval(tick);
-  }, 90);
-  function finish(){
+    if(p < 100 && !closed) requestAnimationFrame(grow);
+  })();
+
+  function close(){
+    if(closed) return;
+    closed = true;
     bar.style.width = '100%';
-    setTimeout(function(){
-      pre.classList.add('done');
-      document.body.classList.add('loaded');
-    }, 260);
+    pre.classList.add('done');
+    document.body.classList.add('loaded');
+    startSite();                         /* сайт оживает после занавеса */
+    setTimeout(function(){ pre.style.display = 'none'; }, 1200);
   }
-  window.addEventListener('load', finish);
-  setTimeout(finish, 2600); /* страховка, если картинка не загрузилась */
+
+  function tryClose(){
+    var passed = Date.now() - started;
+    if(loaded && passed >= SHOW_TIME) close();
+    else if(loaded) setTimeout(close, SHOW_TIME - passed);
+  }
+
+  window.addEventListener('load', function(){ loaded = true; tryClose(); });
+  setTimeout(function(){ loaded = true; tryClose(); }, 6000);  /* страховка */
 })();
+
+/* ---------- запуск анимаций сайта ---------- */
+function startSite(){
+  observeReveals();
+  document.getElementById('hero').classList.add('in');
+}
 
 /* ---------- шапка: прогресс, скрытие, активный пункт ---------- */
 (function(){
@@ -1948,11 +2007,7 @@ if(FANCY){
 /* ============================================================
    ГЕРОЙ
    ============================================================ */
-/* запуск входных анимаций героя */
-(function(){
-  var hero = document.getElementById('hero');
-  setTimeout(function(){ hero.classList.add('in'); }, REDUCED ? 0 : 320);
-})();
+/* входные анимации героя запускает startSite() после ухода заставки */
 
 /* ---------- анимированный фон героя ---------- */
 if(!REDUCED){
