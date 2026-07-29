@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>adion form — разработка сайтов, лендингов и инфографики</title>
+<meta name="description" content="Проектирую и собираю лендинги, корпоративные сайты и инфографику. Фиксированная цена, цифровое ТЗ, контент-план, приём оплат и подписок. Тарифы от $300.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-0:#07090d;
+  --bg-1:#0c1220;
+  --blue-deep:#0a1c3d;
+  --blue-mid:#123a72;
+  --blue-card:#12294f;
+  --blue-bright:#1668c9;
+  --blue-bright-2:#1b76e0;
+  --red:#ef4a52;
+  --red-hover:#d9383f;
+  --ink:#ffffff;
+  --soft:#dbe4f2;
+  --muted:#a9b6cc;
+  --dim:#6b7690;
+  --line:rgba(255,255,255,.08);
+  --line-2:rgba(255,255,255,.14);
+  --radius:18px;
+  --wrap:1240px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg-0);
+  color:var(--ink);
+  font-family:'Manrope',system-ui,sans-serif;
+  font-size:16px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+h1,h2,h3,h4,.display{
+  font-family:'Oswald',sans-serif;
+  text-transform:uppercase;
+  font-weight:500;
+  letter-spacing:.01em;
+  line-height:1.05;
+}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+ul{list-style:none}
+
+.wrap{width:100%;max-width:var(--wrap);margin:0 auto;padding:0 28px}
+section{position:relative}
+
+/* ---------- утилиты ---------- */
+.eyebrow{
+  font-family:'Manrope',sans-serif;
+  text-transform:uppercase;
+  letter-spacing:.18em;
+  font-size:12px;
+  font-weight:600;
+  color:var(--blue-bright-2);
+}
+.rule{width:56px;height:2px;background:var(--red);margin:14px 0}
+.dashed{border-top:1px dashed rgba(255,255,255,.16)}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  background:var(--red);color:#fff;
+  padding:15px 34px;border-radius:999px;
+  font-weight:600;font-size:15px;
+  border:none;cursor:pointer;
+  transition:transform .25s ease, background .25s ease, box-shadow .25s ease;
+  box-shadow:0 8px 30px rgba(239,74,82,.22);
+}
+.btn:hover{background:var(--red-hover);transform:translateY(-2px);box-shadow:0 14px 38px rgba(239,74,82,.34)}
+.btn:active{transform:translateY(0)}
+.btn-ghost{
+  background:transparent;border:1px solid var(--line-2);color:var(--soft);
+  box-shadow:none;
+}
+.btn-ghost:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.28)}
+
+/* ---------- анимации появления ---------- */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .8s ease, transform .8s cubic-bezier(.2,.7,.3,1)}
+.reveal.in{opacity:1;transform:none}
+.reveal.d1{transition-delay:.08s}
+.reveal.d2{transition-delay:.16s}
+.reveal.d3{transition-delay:.24s}
+
+/* ---------- шапка ---------- */
+header{
+  position:sticky;top:0;z-index:60;
+  background:rgba(7,9,13,.72);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.nav{display:flex;align-items:center;gap:28px;height:76px}
+.logo{font-family:'Oswald',sans-serif;font-size:24px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.logo span{color:var(--red)}
+.logo-sub{
+  font-family:'Manrope',sans-serif;font-size:11px;line-height:1.3;
+  color:var(--dim);text-transform:none;letter-spacing:0;max-width:110px;
+}
+.brand{display:flex;align-items:center;gap:12px}
+.nav-links{display:flex;gap:26px;margin-left:auto;font-size:14px;color:var(--muted)}
+.nav-links a{position:relative;padding:4px 0;transition:color .2s}
+.nav-links a:hover{color:#fff}
+.nav-links a::after{
+  content:'';position:absolute;left:0;bottom:0;height:1px;width:0;background:var(--red);transition:width .25s
+}
+.nav-links a:hover::after{width:100%}
+.nav .btn{padding:12px 24px;font-size:14px}
+.burger{
+  display:none;margin-left:auto;width:44px;height:44px;border:1px solid var(--line-2);
+  background:transparent;border-radius:12px;cursor:pointer;position:relative
+}
+.burger i{
+  position:absolute;left:12px;right:12px;height:2px;background:#fff;transition:.3s
+}
+.burger i:nth-child(1){top:15px}
+.burger i:nth-child(2){top:21px}
+.burger i:nth-child(3){top:27px}
+.burger.open i:nth-child(1){top:21px;transform:rotate(45deg)}
+.burger.open i:nth-child(2){opacity:0}
+.burger.open i:nth-child(3){top:21px;transform:rotate(-45deg)}
+.mobile-menu{display:none;border-top:1px solid var(--line);background:rgba(7,9,13,.98);padding:18px 28px 26px}
+.mobile-menu.open{display:block}
+.mobile-menu a{display:block;padding:13px 0;border-bottom:1px solid var(--line);font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:17px}
+.mobile-menu .btn{width:100%;margin-top:20px}
+
+/* ---------- hero ---------- */
+.hero{
+  background:
+    radial-gradient(120% 80% at 85% 0%, rgba(18,58,114,.55) 0%, rgba(7,9,13,0) 60%),
+    linear-gradient(160deg, var(--bg-0) 0%, var(--bg-0) 38%, var(--blue-deep) 100%);
+  overflow:hidden;
+}
+.hero-inner{position:relative;padding:70px 0 0}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:20px;align-items:end;min-height:560px}
+.hero-copy{padding-bottom:56px;position:relative;z-index:3}
+.hero-lead{color:var(--soft);font-size:19px;max-width:520px;margin-bottom:26px}
+.hero h1{
+  font-size:clamp(46px,7.4vw,104px);
+  font-weight:400;
+  letter-spacing:-.005em;
+  margin-bottom:34px;
+}
+.hero h1 em{font-style:normal;color:var(--blue-bright-2)}
+.hero-photo{position:relative;align-self:end;justify-self:center;max-width:520px}
+.hero-photo img{
+  border-radius:20px 20px 0 0;
+  -webkit-mask-image:linear-gradient(to bottom, #000 62%, transparent 100%);
+  mask-image:linear-gradient(to bottom, #000 62%, transparent 100%);
+  filter:saturate(.9) contrast(1.05);
+}
+.hero-photo::before{
+  content:'';position:absolute;inset:-14% -18% 0 -18%;
+  background:radial-gradient(60% 60% at 50% 45%, rgba(22,104,201,.35), transparent 70%);
+  filter:blur(30px);z-index:-1;
+}
+.stats{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:20px;
+  padding:0 0 84px;position:relative;z-index:4;margin-top:-40px;
+}
+.stat{
+  background:rgba(255,255,255,.045);
+  border:1px solid var(--line-2);
+  border-radius:var(--radius);
+  padding:26px 28px 28px;
+  backdrop-filter:blur(10px);
+}
+.stat b{font-family:'Oswald',sans-serif;font-weight:500;font-size:clamp(30px,3.4vw,44px);display:block;line-height:1}
+.stat .rule{margin:12px 0 14px}
+.stat span{color:var(--soft);font-size:15px;line-height:1.5;display:block}
+
+/* ---------- секции ---------- */
+.sec{padding:104px 0}
+.sec-title{font-size:clamp(38px,5.6vw,72px);font-weight:400}
+.sec-sub{color:var(--muted);max-width:620px;margin-top:20px;font-size:17px}
+
+.tint-blue{
+  background:linear-gradient(150deg, var(--bg-0) 0%, #0b1a33 45%, var(--blue-mid) 130%);
+}
+.tint-dark{background:linear-gradient(200deg, #0a1224 0%, var(--bg-0) 55%)}
+
+/* ---------- акции ---------- */
+.promo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:52px}
+.promo{
+  background:linear-gradient(140deg, var(--blue-bright) 0%, #1257a8 100%);
+  border-radius:var(--radius);
+  padding:30px 32px 34px;
+  box-shadow:0 20px 50px rgba(6,26,58,.45);
+  transition:transform .3s ease, box-shadow .3s ease;
+}
+.promo:hover{transform:translateY(-4px);box-shadow:0 26px 60px rgba(6,26,58,.6)}
+.promo h3{font-size:23px;margin-bottom:18px;font-weight:500}
+.promo li{
+  position:relative;padding-left:20px;margin-bottom:10px;
+  font-size:15px;color:#eaf2ff;line-height:1.55;
+}
+.promo li::before{content:'';position:absolute;left:2px;top:10px;width:5px;height:5px;border-radius:50%;background:#fff;opacity:.8}
+.promo .tag{
+  display:inline-block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  background:rgba(255,255,255,.16);padding:5px 12px;border-radius:999px;margin-bottom:16px;font-weight:600;
+}
+
+/* ---------- направления ---------- */
+.dirs{display:grid;grid-template-columns:.85fr 1.15fr;gap:60px;align-items:start}
+.dirs-title{position:sticky;top:120px}
+.dirs-panel{
+  background:linear-gradient(170deg, rgba(18,41,79,.9) 0%, rgba(10,28,61,.75) 100%);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:46px 48px;
+}
+.dir{position:relative;padding-bottom:38px;margin-bottom:38px}
+.dir:not(:last-child){border-bottom:1px dashed rgba(255,255,255,.16)}
+.dir:last-child{padding-bottom:12px;margin-bottom:0}
+.dir .chev{
+  position:absolute;left:-72px;top:2px;
+  width:38px;height:34px;border-radius:8px 0 0 8px;
+  background:var(--blue-bright);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:15px;
+}
+.dir h3{font-size:clamp(22px,2.5vw,30px);margin-bottom:16px;font-weight:500}
+.dir p{color:var(--soft);font-size:16px}
+.dir .res{margin-top:16px;font-weight:700;color:#fff}
+.dirs-panel .btn{margin-top:12px}
+
+/* ---------- тарифы ---------- */
+.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:56px;align-items:start}
+.plan{
+  background:linear-gradient(180deg, rgba(255,255,255,.05) 0%, rgba(255,255,255,.02) 100%);
+  border:1px solid var(--line-2);
+  border-radius:var(--radius);
+  padding:34px 30px 36px;
+  position:relative;
+  transition:transform .3s ease, border-color .3s ease;
+}
+.plan:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.26)}
+.plan.featured{
+  border:1px solid var(--red);
+  background:linear-gradient(180deg, rgba(239,74,82,.10) 0%, rgba(18,41,79,.5) 100%);
+  box-shadow:0 24px 60px rgba(239,74,82,.14);
+}
+.plan .badge{
+  position:absolute;top:-13px;left:30px;
+  background:var(--red);color:#fff;
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
+  padding:6px 14px;border-radius:999px;
+}
+.plan-name{font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:15px;letter-spacing:.2em;color:var(--blue-bright-2)}
+.plan.featured .plan-name{color:var(--red)}
+.plan-price{font-family:'Oswald',sans-serif;font-size:56px;line-height:1;margin:12px 0 6px;font-weight:500}
+.plan-for{font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:19px;color:#fff;margin-bottom:8px}
+.plan-desc{color:var(--dim);font-size:14px;padding-bottom:22px;border-bottom:1px dashed rgba(255,255,255,.16);margin-bottom:22px}
+.plan ul li{
+  position:relative;padding-left:26px;margin-bottom:12px;
+  font-size:14.5px;color:var(--soft);line-height:1.55;
+}
+.plan ul li::before{
+  content:'';position:absolute;left:0;top:7px;width:14px;height:8px;
+  border-left:2px solid var(--blue-bright-2);border-bottom:2px solid var(--blue-bright-2);
+  transform:rotate(-45deg);
+}
+.plan.featured ul li::before{border-color:var(--red)}
+.plan ul li b{color:#fff;font-weight:700}
+.plan .inherit{
+  font-size:13px;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);
+  margin-bottom:14px;font-weight:600;
+}
+.plan .btn{width:100%;margin-top:26px}
+.plan .term{margin-top:18px;font-size:13px;color:var(--dim);text-align:center}
+
+.addon{
+  margin-top:28px;
+  display:flex;flex-wrap:wrap;align-items:center;gap:18px 30px;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--line-2);
+  border-radius:var(--radius);
+  padding:26px 30px;
+}
+.addon-price{font-family:'Oswald',sans-serif;font-size:32px;white-space:nowrap}
+.addon-price small{font-size:15px;color:var(--muted)}
+.addon p{color:var(--soft);font-size:15px;flex:1;min-width:260px}
+.price-note{margin-top:20px;color:var(--dim);font-size:14px;text-align:center}
+
+/* ---------- полоса-побуждение ---------- */
+.band{
+  padding:120px 0;text-align:center;
+  background:
+    radial-gradient(80% 120% at 50% 0%, rgba(18,58,114,.5), transparent 65%),
+    var(--bg-0);
+}
+.band h2{font-size:clamp(32px,5vw,64px);font-weight:400;max-width:1000px;margin:0 auto}
+.band p{color:var(--muted);max-width:720px;margin:26px auto 34px;font-size:17px}
+
+/* ---------- кейсы ---------- */
+.case{
+  display:grid;grid-template-columns:280px 1fr;gap:24px;margin-top:24px;position:relative;
+}
+.case-who{
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:26px;
+  display:flex;flex-direction:column;gap:8px;
+}
+.case-who .ava{
+  width:66px;height:66px;border-radius:12px;
+  background:linear-gradient(140deg,var(--blue-mid),var(--blue-card));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Oswald',sans-serif;font-size:24px;color:#fff;margin-bottom:8px;
+}
+.case-who h4{font-size:22px;font-weight:500}
+.case-who span{color:var(--dim);font-size:14px}
+.case-who .btn{margin-top:auto;font-size:14px;padding:12px 20px}
+.case-body{
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:32px 34px 34px;position:relative;
+}
+.case-num{
+  position:absolute;top:-1px;right:26px;
+  background:var(--blue-bright);color:#fff;
+  font-family:'Oswald',sans-serif;font-size:15px;
+  padding:8px 14px 10px;border-radius:0 0 10px 10px;
+}
+.case-body h3{font-size:clamp(19px,2.1vw,27px);margin-bottom:16px;padding-right:60px;font-weight:500}
+.case-body p{color:var(--soft);font-size:15.5px}
+.case-quote-label{display:flex;align-items:center;gap:14px;margin:24px 0 12px;color:var(--muted);font-size:15px}
+.case-quote-label::after{content:'';height:2px;width:88px;background:var(--red)}
+.case-quote{color:var(--soft);font-size:15.5px;font-style:italic}
+
+/* ---------- FAQ ---------- */
+.faq-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:52px;align-items:start}
+.faq-left{position:sticky;top:120px}
+.expert{
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:24px;margin-top:40px;
+}
+.expert img{width:96px;height:96px;object-fit:cover;border-radius:12px;margin-bottom:16px}
+.expert h4{font-size:24px;font-weight:500}
+.expert p{color:var(--muted);font-size:14px;margin:6px 0 20px}
+.expert .btn{width:100%}
+.faq-item{
+  background:linear-gradient(140deg, var(--blue-bright) 0%, #1257a8 100%);
+  border-radius:14px;margin-bottom:16px;overflow:hidden;
+}
+.faq-q{
+  display:flex;align-items:flex-start;gap:18px;justify-content:space-between;
+  padding:22px 26px;cursor:pointer;
+  font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:19px;line-height:1.2;font-weight:500;
+}
+.faq-toggle{
+  flex:0 0 auto;width:22px;height:22px;position:relative;transition:transform .3s ease;margin-top:2px;
+}
+.faq-toggle::before,.faq-toggle::after{
+  content:'';position:absolute;background:#fff;border-radius:2px;
+}
+.faq-toggle::before{left:0;right:0;top:10px;height:2px}
+.faq-toggle::after{top:0;bottom:0;left:10px;width:2px}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.faq-a div{padding:0 26px 24px;color:#eaf2ff;font-size:15px}
+.faq-item.open .faq-a{max-height:520px}
+.faq-item.open .faq-toggle{transform:rotate(45deg)}
+
+/* ---------- контакты ---------- */
+.contact{
+  padding:120px 0;text-align:center;
+  background:
+    radial-gradient(90% 100% at 50% 100%, rgba(18,58,114,.55), transparent 70%),
+    var(--bg-0);
+}
+.contact h2{font-size:clamp(30px,4.4vw,56px);font-weight:400;max-width:960px;margin:0 auto}
+.contact .lead{color:var(--muted);max-width:720px;margin:24px auto 40px;font-size:17px}
+.form-pill{
+  display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--line-2);
+  border-radius:999px;
+  padding:12px;max-width:920px;margin:0 auto;
+}
+.form-pill input,.form-pill select{
+  font-family:'Manrope',sans-serif;font-size:15px;color:#fff;
+  background:rgba(255,255,255,.07);
+  border:1px solid transparent;border-radius:999px;
+  padding:15px 22px;outline:none;transition:border-color .2s, background .2s;
+}
+.form-pill input::placeholder{color:var(--dim)}
+.form-pill input:focus,.form-pill select:focus{border-color:var(--blue-bright-2);background:rgba(255,255,255,.1)}
+.f-name{flex:1;min-width:170px}
+.f-phone{flex:1.2;min-width:190px}
+.f-country{width:130px;cursor:pointer}
+.f-country option{background:#0c1220;color:#fff}
+.form-pill .btn{flex:0 0 auto}
+.hint{margin-top:16px;font-size:13px;color:var(--dim);min-height:20px}
+.hint.error{color:var(--red)}
+.alt-contacts{margin-top:26px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+/* ---------- футер ---------- */
+footer{border-top:1px solid var(--line);padding:34px 0;color:var(--dim);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+/* ---------- адаптив ---------- */
+@media (max-width:1080px){
+  .dirs{grid-template-columns:1fr;gap:36px}
+  .dirs-title{position:static}
+  .dirs-panel{padding:38px 30px}
+  .dir .chev{display:none}
+  .faq-grid{grid-template-columns:1fr;gap:36px}
+  .faq-left{position:static}
+  .expert{display:grid;grid-template-columns:96px 1fr;gap:20px;align-items:center}
+  .expert img{margin-bottom:0}
+  .expert .btn{grid-column:1/-1}
+}
+@media (max-width:900px){
+  .nav-links,.nav > .btn{display:none}
+  .burger{display:block}
+  .hero-grid{grid-template-columns:1fr;min-height:0}
+  .hero-photo{max-width:420px;margin-top:20px;order:-1}
+  .hero-copy{padding-bottom:32px}
+  .stats{margin-top:0;padding-bottom:64px}
+  .price-grid{grid-template-columns:1fr;max-width:520px;margin-left:auto;margin-right:auto}
+  .promo-grid{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .wrap{padding:0 20px}
+  .sec{padding:76px 0}
+  .band,.contact{padding:88px 0}
+  .stats{grid-template-columns:1fr}
+  .case{grid-template-columns:1fr}
+  .case-who{flex-direction:row;align-items:center;gap:18px;flex-wrap:wrap}
+  .case-who .ava{margin-bottom:0}
+  .case-who .btn{margin-top:0;width:100%}
+  .case-body{padding:28px 22px}
+  .case-body h3{padding-right:0;margin-top:12px}
+  .form-pill{border-radius:22px;flex-direction:column;align-items:stretch;padding:16px}
+  .form-pill input,.form-pill select,.form-pill .btn,.f-country{width:100%}
+  .dirs-panel{padding:30px 22px}
+}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  .reveal{opacity:1;transform:none;transition:none}
+  .btn,.promo,.plan{transition:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= ШАПКА ================= -->
+<header>
+  <div class="wrap">
+    <div class="nav">
+      <div class="brand">
+        <div class="logo">adion<span>form</span></div>
+        <div class="logo-sub">веб-дизайн<br>и разработка сайтов</div>
+      </div>
+      <nav class="nav-links">
+        <a href="#promo">Акции</a>
+        <a href="#services">Услуги</a>
+        <a href="#pricing">Тарифы</a>
+        <a href="#cases">Кейсы</a>
+        <a href="#faq">Вопросы</a>
+        <a href="#contact">Контакты</a>
+      </nav>
+      <a href="#contact" class="btn">Бесплатная консультация</a>
+      <button class="burger" id="burger" aria-label="Меню" aria-expanded="false"><i></i><i></i><i></i></button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#promo">Акции</a>
+    <a href="#services">Услуги</a>
+    <a href="#pricing">Тарифы</a>
+    <a href="#cases">Кейсы</a>
+    <a href="#faq">Вопросы</a>
+    <a href="#contact">Контакты</a>
+    <a href="#contact" class="btn">Бесплатная консультация</a>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="wrap hero-inner">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <p class="hero-lead">Соберу сайт, который приносит заявки, — с продающей структурой, текстами и аналитикой, а не просто красивой картинкой.</p>
+        <h1>Дизайн<br>и разработка<br><em>сайтов</em></h1>
+        <a href="#contact" class="btn">Бесплатная консультация</a>
+      </div>
+      <!-- ЗАМЕНИТЕ photo.jpg на своё фото (портрет, вертикальный, ~800×1000) -->
+      <div class="hero-photo">
+        <img src="photo.jpg" alt="Веб-дизайнер adion form">
+      </div>
+    </div>
+
+    <!-- ЦИФРЫ НИЖЕ — ДЕМО. Замените на свои реальные показатели -->
+    <div class="stats">
+      <div class="stat reveal">
+        <b>5 ЛЕТ</b><div class="rule"></div>
+        <span>в коммерческом веб-дизайне</span>
+      </div>
+      <div class="stat reveal d1">
+        <b>+40</b><div class="rule"></div>
+        <span>реализованных проектов: лендинги, сайты, инфографика</span>
+      </div>
+      <div class="stat reveal d2">
+        <b>от 7 ДНЕЙ</b><div class="rule"></div>
+        <span>от брифа до запуска лендинга</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= АКЦИИ ================= -->
+<section class="sec tint-blue" id="promo">
+  <div class="wrap">
+    <h2 class="sec-title reveal">Акции</h2>
+    <p class="sec-sub reveal">Условия, которые снимают главный страх заказчика: «заплачу и не пойму, за что».</p>
+
+    <div class="promo-grid">
+      <div class="promo reveal">
+        <span class="tag">Бесплатно</span>
+        <h3>Прототип первого экрана в подарок</h3>
+        <ul>
+          <li>Разбор вашей ниши и конкурентов — 20 минут</li>
+          <li>Набросок первого экрана с заголовком и оффером</li>
+          <li>Честная оценка: сколько займёт и сколько будет стоить</li>
+          <li>Ничего не должны — прототип остаётся у вас</li>
+        </ul>
+      </div>
+      <div class="promo reveal d1">
+        <span class="tag">Гарантия</span>
+        <h3>Фиксированная цена без доплат</h3>
+        <ul>
+          <li>Детальная смета до начала работы</li>
+          <li>Все этапы и правки прописаны в договоре</li>
+          <li>Оплата двумя частями: 50% на старте, 50% при сдаче</li>
+          <li>Цена не меняется, даже если работы окажется больше</li>
+        </ul>
+      </div>
+      <div class="promo reveal">
+        <span class="tag">−20%</span>
+        <h3>Скидка на второй проект</h3>
+        <ul>
+          <li>Действует 6 месяцев после сдачи первого сайта</li>
+          <li>Распространяется на любой тариф и на инфографику</li>
+          <li>Работает и для рекомендаций: привели клиента — скидка ваша</li>
+        </ul>
+      </div>
+      <div class="promo reveal d1">
+        <span class="tag">Подарок</span>
+        <h3>Месяц сопровождения при тарифе Business и выше</h3>
+        <ul>
+          <li>Правки текстов и картинок по вашей заявке</li>
+          <li>Мониторинг работы форм и заявок</li>
+          <li>Отчёт: откуда приходят люди и где они уходят</li>
+          <li>Обычно это $150 — вам достаётся бесплатно</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= НАПРАВЛЕНИЯ ================= -->
+<section class="sec tint-dark" id="services">
+  <div class="wrap">
+    <div class="dirs">
+      <div class="dirs-title reveal">
+        <h2 class="sec-title">Основные<br>направления</h2>
+        <p class="sec-sub">Три формата, которые закрывают почти любую задачу малого и среднего бизнеса.</p>
+      </div>
+
+      <div class="dirs-panel reveal d1">
+        <div class="dir">
+          <div class="chev">»</div>
+          <h3>Лендинги под трафик</h3>
+          <p>Одностраничный сайт, заточенный под рекламу. Начинаю не с картинки, а со структуры: кто ваш клиент, чего боится, что должен увидеть в первые пять секунд. Дальше — прототип, продающий текст, дизайн и сборка. На выходе страница, которую можно сразу заливать трафиком, с подключённой аналитикой и кнопками в мессенджеры.</p>
+          <p class="res">Результат: заявки, а не просто визитка в интернете.</p>
+        </div>
+
+        <div class="dir">
+          <div class="chev">»</div>
+          <h3>Корпоративные сайты</h3>
+          <p>Многостраничник для компаний, которые продают дорого и долго: услуги, кейсы, каталог, блог, контакты. Перед стартом собираю цифровое ТЗ — карту сайта, сценарии пользователя и логику форм, чтобы вы точно понимали, что получите. Ставлю CMS, чтобы вы сами меняли тексты и фото, и подключаю CRM с аналитикой.</p>
+          <p class="res">Результат: сайт, который работает как отдел продаж, а не как папка с презентациями.</p>
+        </div>
+
+        <div class="dir">
+          <div class="chev">»</div>
+          <h3>Инфографика и презентации</h3>
+          <p>Превращаю сложное в понятное: схемы процессов, сравнения тарифов, разборы «как мы работаем», карточки для соцсетей и презентации для инвесторов и клиентов. Всё в едином стиле с сайтом — одна палитра, одна типографика, один тон. К этому же собираю контент-план, чтобы было что публиковать после запуска.</p>
+          <p class="res">Результат: вас понимают с первого взгляда и запоминают.</p>
+        </div>
+
+        <a href="#contact" class="btn">Бесплатная консультация</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ТАРИФЫ ================= -->
+<section class="sec tint-blue" id="pricing">
+  <div class="wrap">
+    <h2 class="sec-title reveal">Тарифы</h2>
+    <p class="sec-sub reveal">Три пакета под разные задачи и бюджеты. Цена фиксируется в договоре до начала работ.</p>
+
+    <div class="price-grid">
+      <!-- START -->
+      <div class="plan reveal">
+        <div class="plan-name">Start</div>
+        <div class="plan-price">$300</div>
+        <div class="plan-for">Лендинг под ключ</div>
+        <p class="plan-desc">Для тех, кому нужна одна сильная страница под рекламу или первые продажи.</p>
+        <ul>
+          <li>До <b>6 экранов</b>, индивидуальный дизайн в Figma</li>
+          <li>Прототип структуры + <b>продающий текст</b> (копирайтинг мой)</li>
+          <li>Адаптив: десктоп, планшет, мобильный</li>
+          <li>Кнопки WhatsApp и Telegram + форма заявки</li>
+          <li>Базовое <b>цифровое ТЗ</b>: структура и логика страницы</li>
+          <li>Подключение домена и хостинга, публикация</li>
+          <li>Яндекс.Метрика или GA4 с целью на заявку</li>
+          <li><b>2 круга правок</b>, срок — 7 дней</li>
+        </ul>
+        <a href="#contact" class="btn btn-ghost">Обсудить проект</a>
+        <p class="term">Оплата 50% / 50%</p>
+      </div>
+
+      <!-- BUSINESS -->
+      <div class="plan featured reveal d1">
+        <span class="badge">Чаще всего выбирают</span>
+        <div class="plan-name">Business</div>
+        <div class="plan-price">$1000</div>
+        <div class="plan-for">Корпоративный сайт</div>
+        <p class="plan-desc">Для компаний, которым нужен полноценный сайт с каталогом, кейсами и заявками в CRM.</p>
+        <p class="inherit">Всё из Start, плюс:</p>
+        <ul>
+          <li>До <b>8 страниц</b>: услуги, кейсы, о компании, блог, контакты</li>
+          <li>Полное <b>цифровое ТЗ</b>: карта сайта, сценарии пользователя, логика всех форм</li>
+          <li>Копирайтинг всех страниц, а не только главной</li>
+          <li><b>CMS</b> — сами меняете тексты, фото и цены без программиста</li>
+          <li><b>6 инфографик</b> для сайта и соцсетей в фирменном стиле</li>
+          <li>Интеграция с CRM (amoCRM, Bitrix24) — заявки падают в воронку</li>
+          <li>Аналитика с настроенными целями и картой кликов</li>
+          <li>Базовое SEO: заголовки, мета-теги, скорость, микроразметка</li>
+          <li><b>3 круга правок</b>, срок — 14–18 дней</li>
+          <li><b>Месяц сопровождения в подарок</b></li>
+        </ul>
+        <a href="#contact" class="btn">Обсудить проект</a>
+        <p class="term">Оплата 50% / 50%</p>
+      </div>
+
+      <!-- PREMIUM -->
+      <div class="plan reveal d2">
+        <div class="plan-name">Premium</div>
+        <div class="plan-price">$2500</div>
+        <div class="plan-for">Digital-система под ключ</div>
+        <p class="plan-desc">Для бизнеса, которому нужен не сайт, а работающая система: бренд, контент и приём денег.</p>
+        <p class="inherit">Всё из Business, плюс:</p>
+        <ul>
+          <li><b>Фирменный стиль</b>: логотип, палитра, типографика, гайд по применению</li>
+          <li><b>UI-kit и дизайн-система</b> — новые страницы собираются за часы, а не за недели</li>
+          <li>До <b>15 страниц</b> + вторая языковая версия</li>
+          <li><b>Контент-план на 3 месяца</b>: 36 тем по рубрикам, формат и цель каждого поста</li>
+          <li><b>15 инфографик</b> + презентация компании на 12 слайдов</li>
+          <li><b>Приём оплат и подписок</b>: карты, рассрочка, автосписание, чеки</li>
+          <li>Личный кабинет клиента или квиз-калькулятор стоимости</li>
+          <li>A/B-тест первого экрана и оптимизация до <b>PageSpeed 90+</b></li>
+          <li><b>3 месяца сопровождения</b> и обучение вашей команды</li>
+          <li>Срок — от 4 недель</li>
+        </ul>
+        <a href="#contact" class="btn btn-ghost">Обсудить проект</a>
+        <p class="term">Оплата в 3 этапа</p>
+      </div>
+    </div>
+
+    <div class="addon reveal">
+      <div class="addon-price">$150 <small>/ мес</small></div>
+      <p><b>Сопровождение и развитие.</b> Правки текстов и блоков, новые страницы и баннеры, обновление контента, мониторинг форм и скорости, ежемесячный отчёт по заявкам. Резерв — до 6 часов работы в месяц, неизрасходованные часы переносятся.</p>
+      <a href="#contact" class="btn btn-ghost">Подключить</a>
+    </div>
+
+    <p class="price-note">Цена фиксируется в договоре до старта. Сроки считаются в рабочих днях с момента получения материалов и предоплаты.</p>
+  </div>
+</section>
+
+<!-- ================= ПОБУЖДЕНИЕ ================= -->
+<section class="band">
+  <div class="wrap">
+    <h2 class="reveal">Сайт, который не продаёт,<br>обходится дороже, чем новый</h2>
+    <p class="reveal d1">Каждый месяц со слабой страницей — это слитый рекламный бюджет и клиенты, ушедшие к конкуренту, у которого просто понятнее объяснено. Чем раньше исправите первый экран, тем дешевле это стоит.</p>
+    <a href="#contact" class="btn reveal d2">Бесплатная консультация</a>
+  </div>
+</section>
+
+<!-- ================= КЕЙСЫ ================= -->
+<!-- ВАЖНО: кейсы и цифры ниже — ДЕМОНСТРАЦИОННЫЕ. Замените на реальные перед публикацией -->
+<section class="sec tint-dark" id="cases">
+  <div class="wrap">
+    <h2 class="sec-title reveal">Наши результаты</h2>
+    <p class="sec-sub reveal">Главная цель — не «сдать макет», а чтобы после запуска у вас выросли заявки. Вот как это выглядит на практике.</p>
+
+    <div style="margin-top:52px">
+      <div class="case reveal">
+        <div class="case-who">
+          <div class="ava">АК</div>
+          <h4>Алина К.</h4>
+          <span>студия корпусной мебели, Алматы</span>
+          <a href="#contact" class="btn">Бесплатная консультация</a>
+        </div>
+        <div class="case-body">
+          <div class="case-num">01</div>
+          <h3>Заявок стало в 2,4 раза больше за 6 недель</h3>
+          <p>Собрали лендинг под контекстную рекламу: калькулятор стоимости кухни прямо на первом экране, реальные фото работ вместо стоков, отзывы с именами и сроками. Заявка уходит в WhatsApp за один клик. Срок работы: 8 дней.</p>
+          <div class="case-quote-label">Отзыв:</div>
+          <p class="case-quote">«Старый сайт делали „для галочки“ — с рекламы приходили люди и сразу уходили. Здесь сначала долго разбирали, кто мой клиент и что его останавливает, и только потом рисовали. За полтора месяца заявок стало почти в два с половиной раза больше при том же бюджете на рекламу».</p>
+        </div>
+      </div>
+
+      <div class="case reveal">
+        <div class="case-who">
+          <div class="ava">ТЖ</div>
+          <h4>Тимур Ж.</h4>
+          <span>поставки промышленного оборудования, B2B</span>
+          <a href="#contact" class="btn">Бесплатная консультация</a>
+        </div>
+        <div class="case-body">
+          <div class="case-num">02</div>
+          <h3>Корпоративный сайт с CRM: цикл сделки короче на 30%</h3>
+          <p>8 страниц с каталогом и техническими карточками, цифровое ТЗ на 20 листов, интеграция с amoCRM и подключённая аналитика. Менеджеры перестали вручную переписывать заявки, а клиенты — звонить с вопросами, ответы на которые теперь есть на сайте. Срок: 17 дней.</p>
+          <div class="case-quote-label">Отзыв:</div>
+          <p class="case-quote">«Мне важнее всего было понимать заранее, что я получу. ТЗ мы согласовали до первой картинки, и потом всё совпало один в один. Сейчас заявка сразу попадает в воронку с источником — стало видно, какая реклама реально работает».</p>
+        </div>
+      </div>
+
+      <div class="case reveal">
+        <div class="case-who">
+          <div class="ava">МР</div>
+          <h4>Мария Р.</h4>
+          <span>онлайн-школа английского</span>
+          <a href="#contact" class="btn">Бесплатная консультация</a>
+        </div>
+        <div class="case-body">
+          <div class="case-num">03</div>
+          <h3>Инфографика и контент-план: охваты выросли втрое</h3>
+          <p>Сделали фирменный стиль, 15 инфографик, презентацию для партнёров и контент-план на 3 месяца — 36 тем с форматом и целью каждой публикации. На сайте подключили приём оплат и ежемесячную подписку с автосписанием. Срок: 5 недель.</p>
+          <div class="case-quote-label">Отзыв:</div>
+          <p class="case-quote">«Раньше каждый пост придумывали в последний момент и оформляли кто во что горазд. Теперь есть план на квартал и шаблоны, всё в одном стиле. И главное — люди оплачивают подписку прямо на сайте, без переписки и переводов на карту».</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section class="sec tint-blue" id="faq">
+  <div class="wrap">
+    <div class="faq-grid">
+      <div class="faq-left reveal">
+        <h2 class="sec-title">Ответы на<br>частые вопросы</h2>
+        <div class="expert">
+          <img src="photo.jpg" alt="Веб-дизайнер adion form">
+          <div>
+            <h4>adion form</h4>
+            <p>Веб-дизайн, разработка сайтов и инфографика</p>
+          </div>
+          <a href="#contact" class="btn">Связаться напрямую</a>
+        </div>
+      </div>
+
+      <div class="faq-right reveal d1">
+        <div class="faq-item">
+          <div class="faq-q">Сколько времени займёт работа?<span class="faq-toggle"></span></div>
+          <div class="faq-a"><div>Лендинг — 7 рабочих дней, корпоративный сайт — 14–18 дней, Digital-система — от 4 недель. Отсчёт идёт с момента, когда получены материалы и предоплата. Срок прописывается в договоре: если срываю его по своей вине, дальнейшее сопровождение бесплатно.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">Что такое цифровое ТЗ и зачем оно мне?<span class="faq-toggle"></span></div>
+          <div class="faq-a"><div>Это документ, который мы согласуем до первой картинки: карта страниц, что и в каком порядке видит посетитель, какие поля в формах, куда уходят заявки, какие блоки обязательные. Он защищает вас от ситуации «я представлял себе другое» и остаётся вашей собственностью — по нему сможет работать любой другой подрядчик, если вы захотите продолжить без меня.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">Я не умею писать тексты. Кто их делает?<span class="faq-toggle"></span></div>
+          <div class="faq-a"><div>Я. Копирайтинг входит во все тарифы и отдельно не оплачивается. От вас нужны только факты: что продаёте, чем отличаетесь, какие вопросы чаще всего задают клиенты. Формулировки, структуру и заголовки беру на себя, вы согласуете готовый текст до отрисовки дизайна.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">Как проходит оплата? Можно частями?<span class="faq-toggle"></span></div>
+          <div class="faq-a"><div>Start и Business — двумя частями: 50% на старте, 50% при сдаче. Premium — тремя этапами по мере готовности блоков. Отдельно: в тарифе Premium я настраиваю приём оплат и подписок уже на вашем сайте — карты, рассрочка, автосписание по подписке и автоматические чеки клиенту.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">Что входит в контент-план?<span class="faq-toggle"></span></div>
+          <div class="faq-a"><div>36 тем на три месяца, разбитые по рубрикам: экспертиза, кейсы, ответы на возражения, закулисье, продающие посты. К каждой теме — формат (текст, карусель, инфографика, видео), цель и заготовка заголовка. Плюс 15 готовых инфографик в фирменном стиле, которые можно публиковать сразу.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">Смогу ли я сам менять сайт после сдачи?<span class="faq-toggle"></span></div>
+          <div class="faq-a"><div>Да. Начиная с тарифа Business сайт собирается на CMS: тексты, фото, цены и новости меняются через понятную админку без программиста. При сдаче записываю видеоинструкцию под ваш проект, а первый месяц сопровождения идёт в подарок — если что-то непонятно, просто пишете мне.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">А если мне не понравится дизайн?<span class="faq-toggle"></span></div>
+          <div class="faq-a"><div>До больших затрат мы этого не узнаем — поэтому работа идёт этапами. Сначала прототип и текст, потом два варианта первого экрана на выбор, и только после вашего «да» отрисовывается остальное. Круги правок оговорены в договоре: 2 в тарифе Start, 3 в Business и Premium.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= КОНТАКТЫ ================= -->
+<section class="contact" id="contact">
+  <div class="wrap">
+    <h2 class="reveal">Расскажите о задаче —<br>предложу решение и цену</h2>
+    <p class="lead reveal d1">Оставьте имя и номер, нажмите кнопку — откроется чат с уже готовым сообщением. Отвечаю в течение рабочего дня: разберём вашу нишу, покажу похожие проекты и назову точную стоимость.</p>
+
+    <form class="form-pill reveal d2" id="leadForm" novalidate>
+      <select class="f-country" id="country" aria-label="Код страны"></select>
+      <input class="f-name" id="name" type="text" placeholder="Ваше имя" autocomplete="name">
+      <input class="f-phone" id="phone" type="tel" placeholder="700 123 45 67" autocomplete="tel" inputmode="numeric">
+      <button class="btn" type="submit">Написать в WhatsApp</button>
+    </form>
+    <p class="hint" id="hint">Выберите страну и введите номер сотового</p>
+
+    <div class="alt-contacts reveal">
+      <a href="#" class="btn btn-ghost" id="tgLink" target="_blank" rel="noopener">Написать в Telegram</a>
+      <a href="#" class="btn btn-ghost" id="waPlain" target="_blank" rel="noopener">Просто открыть WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 adion form. Веб-дизайн и разработка сайтов.</span>
+    <span>Сделано с вниманием к деталям.</span>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   ЗАМЕНИТЕ ЭТИ ДВА ЗНАЧЕНИЯ НА СВОИ КОНТАКТЫ
+   WA_NUMBER  — номер WhatsApp только цифрами, с кодом страны
+   TG_USERNAME — ник в Telegram без @
+   ============================================================ */
+var WA_NUMBER   = '77000000000';
+var TG_USERNAME = 'your_username';
+
+/* ---------- появление блоков при скролле ---------- */
+var observer = new IntersectionObserver(function(entries){
+  entries.forEach(function(entry){
+    if(entry.isIntersecting){
+      entry.target.classList.add('in');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(function(el){ observer.observe(el); });
+
+/* ---------- мобильное меню ---------- */
+var burger = document.getElementById('burger');
+var mobileMenu = document.getElementById('mobileMenu');
+burger.addEventListener('click', function(){
+  var open = mobileMenu.classList.toggle('open');
+  burger.classList.toggle('open', open);
+  burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
+mobileMenu.querySelectorAll('a').forEach(function(a){
+  a.addEventListener('click', function(){
+    mobileMenu.classList.remove('open');
+    burger.classList.remove('open');
+    burger.setAttribute('aria-expanded','false');
+  });
+});
+
+/* ---------- FAQ-аккордеон ---------- */
+document.querySelectorAll('.faq-q').forEach(function(q){
+  q.addEventListener('click', function(){
+    q.parentElement.classList.toggle('open');
+  });
+});
+
+/* ---------- телефон: страны СНГ ---------- */
+var COUNTRIES = [
+  { code:'KZ', name:'Казахстан',    dial:'7',   mask:'700 123 45 67', flag:'🇰🇿' },
+  { code:'RU', name:'Россия',       dial:'7',   mask:'912 345 67 89', flag:'🇷🇺' },
+  { code:'BY', name:'Беларусь',     dial:'375', mask:'29 123 45 67',  flag:'🇧🇾' },
+  { code:'UA', name:'Украина',      dial:'380', mask:'50 123 45 67',  flag:'🇺🇦' },
+  { code:'UZ', name:'Узбекистан',   dial:'998', mask:'90 123 45 67',  flag:'🇺🇿' },
+  { code:'KG', name:'Кыргызстан',   dial:'996', mask:'700 123 456',   flag:'🇰🇬' },
+  { code:'TJ', name:'Таджикистан',  dial:'992', mask:'90 123 45 67',  flag:'🇹🇯' },
+  { code:'TM', name:'Туркменистан', dial:'993', mask:'65 12 34 56',   flag:'🇹🇲' },
+  { code:'AZ', name:'Азербайджан',  dial:'994', mask:'50 123 45 67',  flag:'🇦🇿' },
+  { code:'AM', name:'Армения',      dial:'374', mask:'77 123 456',    flag:'🇦🇲' },
+  { code:'GE', name:'Грузия',       dial:'995', mask:'555 12 34 56',  flag:'🇬🇪' },
+  { code:'MD', name:'Молдова',      dial:'373', mask:'621 12 345',    flag:'🇲🇩' }
+];
+
+var phone      = document.getElementById('phone');
+var nameField  = document.getElementById('name');
+var hint       = document.getElementById('hint');
+var countrySel = document.getElementById('country');
+
+COUNTRIES.forEach(function(c, i){
+  var o = document.createElement('option');
+  o.value = i;
+  o.textContent = c.flag + ' +' + c.dial;
+  o.title = c.name;
+  countrySel.appendChild(o);
+});
+
+function current(){ return COUNTRIES[countrySel.value]; }
+function groups(mask){ return mask.split(' ').map(function(g){ return g.length; }); }
+function maxDigits(mask){ return mask.replace(/\D/g, '').length; }
+
+function formatPhone(value){
+  var c = current();
+  var d = value.replace(/\D/g, '');
+  /* если вставили номер целиком — убираем код страны и ведущую 8 */
+  if (d.indexOf(c.dial) === 0 && d.length > maxDigits(c.mask)) d = d.slice(c.dial.length);
+  if (c.dial === '7' && d.charAt(0) === '8' && d.length > 10) d = d.slice(1);
+  d = d.slice(0, maxDigits(c.mask));
+
+  var out = '', pos = 0;
+  groups(c.mask).forEach(function(len){
+    if (pos >= d.length) return;
+    out += (out ? ' ' : '') + d.substr(pos, len);
+    pos += len;
+  });
+  return out;
+}
+
+function resetHint(){
+  hint.classList.remove('error');
+  hint.textContent = 'Выберите страну и введите номер сотового';
+}
+
+function applyCountry(){
+  var c = current();
+  phone.placeholder = c.mask;
+  phone.value = '';
+  resetHint();
+}
+
+countrySel.addEventListener('change', applyCountry);
+applyCountry();
+
+phone.addEventListener('input', function(){
+  this.value = formatPhone(this.value);
+  resetHint();
+});
+
+phone.addEventListener('paste', function(e){
+  e.preventDefault();
+  this.value = formatPhone((e.clipboardData || window.clipboardData).getData('text'));
+});
+
+/* ---------- отправка в WhatsApp ---------- */
+document.getElementById('leadForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var c = current();
+  var need = maxDigits(c.mask);
+  var digits = phone.value.replace(/\D/g, '');
+  var who = nameField.value.trim();
+
+  if (!who){
+    hint.textContent = 'Напишите, как к вам обращаться';
+    hint.classList.add('error');
+    nameField.focus();
+    return;
+  }
+  if (digits.length !== need){
+    hint.textContent = c.name + ': нужно ' + need + ' цифр после +' + c.dial;
+    hint.classList.add('error');
+    phone.focus();
+    return;
+  }
+
+  var text = 'Здравствуйте! Меня зовут ' + who + '. Хочу обсудить сайт.\n' +
+             'Мой номер: +' + c.dial + digits + ' (' + c.name + ').';
+  window.open('https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(text), '_blank', 'noopener');
+
+  hint.classList.remove('error');
+  hint.textContent = 'Открываю WhatsApp — сообщение уже готово, осталось нажать «отправить».';
+});
+
+/* ---------- прямые ссылки на мессенджеры ---------- */
+document.getElementById('tgLink').href  = 'https://t.me/' + TG_USERNAME;
+document.getElementById('waPlain').href = 'https://wa.me/' + WA_NUMBER;
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+# системные файлы Windows / OneDrive
+Thumbs.db
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/
+*.tmp
+
+# macOS
+.DS_Store
+
+# редакторы
+.vscode/
+.idea/
+*.swp
