@@ -35,6 +35,13 @@ function doPost(e) {
     var row = saveToSheet(data);
     sendNotification(data, row);
 
+    /* уведомление в Telegram — необязательное, поэтому сбой здесь не должен ломать приём заявки */
+    try {
+      sendTelegram(data, row);
+    } catch (tgErr) {
+      Logger.log('Telegram не сработал: ' + tgErr);
+    }
+
     return json({ ok: true, row: row });
 
   } catch (err) {
@@ -156,6 +163,82 @@ function sendNotification(data, row) {
 }
 
 
+/**
+ * Присылает заявку в Telegram.
+ *
+ * Токен и chat_id берутся из свойств скрипта — в коде их держать нельзя,
+ * иначе они утекут вместе с репозиторием.
+ * Настройки проекта → Свойства скрипта → добавить:
+ *   TG_TOKEN    — токен бота от @BotFather
+ *   TG_CHAT_ID  — ваш числовой id от @userinfobot
+ * Пока свойства не заданы, функция просто ничего не делает.
+ */
+function sendTelegram(data, row) {
+  var props  = PropertiesService.getScriptProperties();
+  var token  = props.getProperty('TG_TOKEN');
+  var chatId = props.getProperty('TG_CHAT_ID');
+
+  if (!token || !chatId) return;
+
+  var lines = [
+    '🔔 <b>Новая заявка с сайта</b>',
+    '',
+    '👤 <b>Имя:</b> ' + esc(data.name),
+    '📞 <b>Телефон:</b> ' + esc(data.phone),
+    '✉️ <b>Почта:</b> ' + esc(data.email)
+  ];
+
+  if (data.task)    lines.push('🎯 <b>Задача:</b> ' + esc(data.task));
+  if (data.country) lines.push('📍 <b>Страна:</b> ' + esc(data.country));
+  if (data.comment) lines.push('💬 <b>Комментарий:</b> ' + esc(data.comment));
+
+  lines.push('');
+  lines.push('🕐 ' + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd.MM.yyyy HH:mm'));
+  lines.push('📊 Записана в таблицу, строка ' + row);
+
+  var digits = String(data.phone || '').replace(/\D/g, '');
+  var buttons = [];
+
+  if (digits) {
+    buttons.push([
+      { text: '💬 Написать в WhatsApp', url: 'https://wa.me/' + digits },
+      { text: '📞 Позвонить',           url: 'tel:+' + digits }
+    ]);
+  }
+  if (data.email) {
+    buttons.push([{ text: '✉️ Ответить на почту', url: 'mailto:' + data.email }]);
+  }
+
+  var payload = {
+    chat_id: chatId,
+    text: lines.join('\n'),
+    parse_mode: 'HTML',
+    disable_web_page_preview: true
+  };
+
+  if (buttons.length) {
+    payload.reply_markup = { inline_keyboard: buttons };
+  }
+
+  var res = UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  });
+
+  if (res.getResponseCode() !== 200) {
+    Logger.log('Telegram ответил ошибкой: ' + res.getContentText());
+  }
+}
+
+
+/** Экранирует символы, которые Telegram считает разметкой. */
+function esc(v) {
+  return String(v || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+
 function rowHtml(label, value) {
   if (!value) return '';
   return '<tr>' +
@@ -196,5 +279,31 @@ function testLead() {
   };
   var row = saveToSheet(demo);
   sendNotification(demo, row);
+  sendTelegram(demo, row);
   Logger.log('Готово: записана строка ' + row + ', письмо отправлено на ' + NOTIFY_EMAIL);
+}
+
+
+/**
+ * Проверка только Telegram — запустите после того, как добавите
+ * свойства TG_TOKEN и TG_CHAT_ID. В Telegram должно прийти тестовое сообщение.
+ */
+function testTelegram() {
+  var props = PropertiesService.getScriptProperties();
+
+  if (!props.getProperty('TG_TOKEN') || !props.getProperty('TG_CHAT_ID')) {
+    Logger.log('Не заданы TG_TOKEN и TG_CHAT_ID: Настройки проекта → Свойства скрипта');
+    return;
+  }
+
+  sendTelegram({
+    name: 'Тестовый клиент',
+    phone: '+7 777 058 8776',
+    email: 'test@example.com',
+    task: 'лендинг',
+    country: 'Казахстан',
+    comment: 'Проверка связи с Telegram.'
+  }, 0);
+
+  Logger.log('Сообщение отправлено — проверьте Telegram.');
 }
