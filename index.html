@@ -12,6 +12,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+/* Выполняется до отрисовки страницы: запрещаем браузеру восстанавливать
+   прошлую прокрутку и убираем якорь из адреса, пока он не сработал.
+   Иначе сайт открывается на форме заявки вместо первого экрана. */
+if('scrollRestoration' in history) history.scrollRestoration = 'manual';
+if(location.hash && location.hash.length > 1){
+  history.replaceState(null, '', location.pathname + location.search);
+}
+</script>
 <style>
 /* ============================================================
    1. ТОКЕНЫ
@@ -61,6 +70,8 @@ body{
   overflow-x:hidden;
 }
 body.lock{overflow:hidden}
+/* пока идёт заставка, страницу нельзя прокрутить — сайт всегда открывается сверху */
+html.booting,html.booting body{overflow:hidden;height:100%}
 h1,h2,h3,h4,.display{
   font-family:'Oswald',sans-serif;
   text-transform:uppercase;
@@ -1829,6 +1840,24 @@ var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 var TOUCH   = window.matchMedia('(hover: none), (pointer: coarse)').matches;
 var FANCY   = !REDUCED && !TOUCH;   /* тяжёлые эффекты только на десктопе */
 
+/* ============================================================
+   СТАРТ ВСЕГДА С ПЕРВОГО ЭКРАНА
+   Браузер любит возвращать посетителя туда, где он был в прошлый раз,
+   а якорь в ссылке (#contact) уводит сразу к форме. И то и другое
+   ломает открытие сайта — гасим оба случая.
+   ============================================================ */
+(function(){
+  if('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
+  /* якорь в адресе убираем до того, как браузер успеет прыгнуть по нему */
+  if(location.hash && location.hash.length > 1){
+    history.replaceState(null, '', location.pathname + location.search);
+  }
+
+  window.scrollTo(0, 0);
+  document.documentElement.classList.add('booting');   /* прокрутка выключена, пока идёт заставка */
+})();
+
 /* ---------- появление блоков при скролле ---------- */
 var revealObserver = new IntersectionObserver(function(entries){
   entries.forEach(function(entry){
@@ -1879,6 +1908,12 @@ document.querySelectorAll('.split').forEach(function(el){
     if(closed) return;
     closed = true;
     bar.style.width = '100%';
+    window.scrollTo(0, 0);                                  /* открываемся с первого экрана */
+    document.documentElement.classList.remove('booting');   /* прокрутка снова доступна */
+    /* браузер может отложить прыжок по якорю до момента, когда страница
+       снова станет прокручиваемой — гасим его сразу после снятия блокировки */
+    window.scrollTo(0, 0);
+    setTimeout(function(){ window.scrollTo(0, 0); }, 60);
     pre.classList.add('done');
     document.body.classList.add('loaded');
     startSite();                         /* сайт оживает после занавеса */
