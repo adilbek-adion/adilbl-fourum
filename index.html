@@ -2415,6 +2415,22 @@ function leadToText(lead){
          'Почта: ' + lead.email;
 }
 
+/* Открывает WhatsApp. Если браузер заблокировал всплывающее окно —
+   не молчим, а показываем клиенту ссылку, по которой он откроет чат сам. */
+function openWhatsApp(lead){
+  var url = 'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(leadToText(lead));
+  var win = window.open(url, '_blank', 'noopener');
+
+  if(!win || win.closed || typeof win.closed === 'undefined'){
+    hint.classList.remove('ok');
+    hint.classList.add('error');
+    hint.innerHTML = 'Браузер заблокировал новое окно — ' +
+      '<a href="' + url + '" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline">откройте WhatsApp вручную</a>.';
+    return false;
+  }
+  return true;
+}
+
 /* ---------- экран «заявка отправлена» ---------- */
 var leadForm  = document.getElementById('leadForm');
 var submitBtn = document.getElementById('submitBtn');
@@ -2447,10 +2463,11 @@ leadForm.addEventListener('submit', function(e){
 
   /* эндпоинт не настроен — работаем по-старому, через WhatsApp */
   if(!FORM_ENDPOINT){
-    window.open('https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(leadToText(lead)), '_blank', 'noopener');
-    hint.classList.remove('error');
-    hint.classList.add('ok');
-    hint.textContent = 'Открываю WhatsApp — сообщение уже готово, осталось нажать «отправить».';
+    if(openWhatsApp(lead)){
+      hint.classList.remove('error');
+      hint.classList.add('ok');
+      hint.textContent = 'Открываю WhatsApp — сообщение уже готово, осталось нажать «отправить».';
+    }
     return;
   }
 
@@ -2504,7 +2521,7 @@ leadForm.addEventListener('submit', function(e){
       restore();
       hint.classList.add('error');
       hint.textContent = 'Не удалось отправить — напишите мне в WhatsApp, сообщение уже готово.';
-      window.open('https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(leadToText(lead)), '_blank', 'noopener');
+      openWhatsApp(lead);
     });
   });
 });
