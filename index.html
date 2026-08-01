@@ -696,8 +696,8 @@ header.top{background:rgba(7,9,13,.35);border-color:transparent}
 }
 .work-info{
   position:absolute;left:0;right:0;bottom:0;z-index:2;
-  padding:26px 24px 22px;
-  background:linear-gradient(180deg,transparent, rgba(4,6,10,.92));
+  padding:64px 24px 22px;
+  background:linear-gradient(180deg,rgba(4,6,10,0) 0%,rgba(4,6,10,.62) 34%,rgba(4,6,10,.93) 68%,rgba(4,6,10,.98) 100%);
   transform:translateY(14px);opacity:.85;
   transition:transform var(--t-mid) var(--ease-soft), opacity var(--t-mid);
 }
@@ -709,6 +709,59 @@ header.top{background:rgba(7,9,13,.35);border-color:transparent}
   background:rgba(7,9,13,.7);border:1px solid var(--line-2);backdrop-filter:blur(8px);
   font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);
   padding:6px 12px;border-radius:999px;
+}
+/* подсказка «открыть» на карточках с полным скриншотом */
+.work[data-full]::after{
+  content:"Смотреть целиком";
+  position:absolute;z-index:3;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);
+  padding:13px 26px;border-radius:999px;white-space:nowrap;
+  background:var(--red);color:#fff;font-family:'Oswald',sans-serif;
+  font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+  opacity:0;transition:opacity .35s var(--ease-soft),transform .35s var(--ease-soft);
+  box-shadow:0 16px 34px -14px rgba(239,74,82,.8);pointer-events:none;
+}
+.work[data-full]:hover::after{opacity:1;transform:translate(-50%,-50%) scale(1)}
+
+/* ===== ПРОСМОТРЩИК РАБОТ ===== */
+.viewer{
+  position:fixed;inset:0;z-index:9500;display:none;
+  background:rgba(4,6,10,.96);backdrop-filter:blur(10px);
+}
+.viewer.is-open{display:block;animation:vwIn .35s var(--ease-soft)}
+@keyframes vwIn{from{opacity:0}to{opacity:1}}
+.viewer__scroll{
+  position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;
+  padding:84px 16px 60px;-webkit-overflow-scrolling:touch;
+}
+.viewer__img{
+  display:block;width:min(1100px,100%);margin:0 auto;border-radius:14px;
+  border:1px solid var(--line-2);box-shadow:0 40px 90px -40px #000;
+  animation:vwUp .5s var(--ease-soft) both;
+}
+@keyframes vwUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+.viewer__bar{
+  position:absolute;top:0;left:0;right:0;height:68px;z-index:2;
+  display:flex;align-items:center;gap:16px;padding:0 clamp(14px,3vw,32px);
+  background:linear-gradient(180deg,rgba(4,6,10,.96),rgba(4,6,10,0));
+}
+.viewer__ttl{font-family:'Oswald',sans-serif;font-size:17px;letter-spacing:.1em;text-transform:uppercase;color:#fff}
+.viewer__sub{font-size:12.5px;color:var(--muted);letter-spacing:.06em}
+.viewer__close{
+  margin-left:auto;width:46px;height:46px;border-radius:50%;flex:0 0 auto;
+  background:rgba(255,255,255,.07);border:1px solid var(--line-2);color:#fff;
+  cursor:pointer;font-size:22px;line-height:1;transition:background .3s,transform .3s var(--ease-soft);
+}
+.viewer__close:hover{background:var(--red);transform:rotate(90deg)}
+.viewer__hint{
+  position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:2;
+  font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  background:rgba(4,6,10,.8);padding:8px 18px;border-radius:999px;border:1px solid var(--line);
+}
+@media(max-width:700px){
+  .viewer__scroll{padding:76px 10px 54px}
+  .viewer__ttl{font-size:14px}
+  .viewer__sub{display:none}
+  .viewer__hint{display:none}
 }
 
 /* кейсы */
@@ -1596,10 +1649,11 @@ footer{
     <p class="sec-sub reveal d1">Лендинги, сайты, презентации и фирменный стиль. Полное портфолио с разбором задач присылаю в переписке.</p>
 
     <div class="works-grid">
-      <a href="#contact" class="work reveal-zoom">
-        <div class="work-media"><div class="ph"><span>место для скриншота<br>work-1.jpg</span></div></div>
+      <a href="#contact" class="work reveal-zoom"
+         data-full="work-1-full.jpg" data-ttl="Фитнес-клуб PULSE FIT" data-sub="Лендинг · дизайн, вёрстка и анимации">
+        <div class="work-media"><img src="work-1.jpg" alt="Лендинг фитнес-клуба PULSE FIT"></div>
         <span class="work-tag">Лендинг</span>
-        <div class="work-info"><b>Студия мебели</b><span>дизайн + вёрстка</span></div>
+        <div class="work-info"><b>Фитнес-клуб PULSE FIT</b><span>дизайн + вёрстка + анимации</span></div>
       </a>
       <a href="#contact" class="work reveal-zoom d1">
         <div class="work-media"><div class="ph"><span>место для скриншота<br>work-2.jpg</span></div></div>
@@ -1621,10 +1675,11 @@ footer{
         <span class="work-tag">Инфографика</span>
         <div class="work-info"><b>Пакет для соцсетей</b><span>15 материалов</span></div>
       </a>
-      <a href="#contact" class="work reveal-zoom d2">
-        <div class="work-media"><div class="ph"><span>место для скриншота<br>work-6.jpg</span></div></div>
-        <span class="work-tag">Лендинг</span>
-        <div class="work-info"><b>Юридические услуги</b><span>дизайн под трафик</span></div>
+      <a href="#contact" class="work reveal-zoom d2"
+         data-full="work-6-full.jpg" data-ttl="Инфографика для Wildberries" data-sub="6 карточек 900 × 1200 · фитнес-резинки FORMA">
+        <div class="work-media"><img src="work-6.jpg" alt="Инфографика для карточки товара на Wildberries"></div>
+        <span class="work-tag">Wildberries</span>
+        <div class="work-info"><b>Инфографика для карточки</b><span>6 слайдов 900 × 1200</span></div>
       </a>
     </div>
 
@@ -2673,6 +2728,61 @@ mailLink.textContent = EMAIL;
 mailLink.href = 'mailto:' + EMAIL + '?subject=' +
   encodeURIComponent('Заявка с сайта adion form') + '&body=' +
   encodeURIComponent('Здравствуйте! Хочу обсудить проект.\n\nЗадача: \nСроки: \nБюджет: ');
+</script>
+
+<!-- ================= ПРОСМОТРЩИК РАБОТ ================= -->
+<div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-label="Просмотр работы">
+  <div class="viewer__bar">
+    <span>
+      <span class="viewer__ttl" id="vwTtl">Работа</span><br>
+      <span class="viewer__sub" id="vwSub"></span>
+    </span>
+    <button class="viewer__close" id="vwClose" aria-label="Закрыть">&times;</button>
+  </div>
+  <div class="viewer__scroll" id="vwScroll">
+    <img class="viewer__img" id="vwImg" src="" alt="">
+  </div>
+  <span class="viewer__hint">Прокручивайте, чтобы посмотреть весь проект · Esc — закрыть</span>
+</div>
+
+<script>
+/* Открытие полного скриншота работы по клику на карточку портфолио */
+(function(){
+  var viewer = document.getElementById('viewer');
+  var img    = document.getElementById('vwImg');
+  var ttl    = document.getElementById('vwTtl');
+  var sub    = document.getElementById('vwSub');
+  var scroll = document.getElementById('vwScroll');
+  var lastY  = 0;
+
+  function open(card){
+    img.src = card.getAttribute('data-full');
+    img.alt = card.getAttribute('data-ttl') || '';
+    ttl.textContent = card.getAttribute('data-ttl') || 'Работа';
+    sub.textContent = card.getAttribute('data-sub') || '';
+    lastY = window.scrollY;
+    viewer.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+    scroll.scrollTop = 0;
+  }
+  function close(){
+    viewer.classList.remove('is-open');
+    document.body.style.overflow = '';
+    img.src = '';
+    window.scrollTo(0, lastY);
+  }
+
+  document.querySelectorAll('.work[data-full]').forEach(function(card){
+    card.addEventListener('click', function(e){ e.preventDefault(); open(card); });
+  });
+  document.getElementById('vwClose').addEventListener('click', close);
+  viewer.addEventListener('click', function(e){
+    if(e.target === viewer || e.target === scroll) close();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && viewer.classList.contains('is-open')) close();
+  });
+})();
 </script>
 </body>
 </html>
